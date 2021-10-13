@@ -3,13 +3,12 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-int INF = 2147483647;
+int MAX_INT = 2147483647;
 
 class Town {
     public:
     int id, x, y;
 
-    Town() {}
     Town(int _id, int _x, int _y) : id(_id), x(_x), y(_y) {}
 
     int dst_sq(Town t) {
@@ -21,40 +20,45 @@ class Town {
     inline bool operator==(const Town& o) { return id == o.id; }
 };
 
-vector<Town> towns;
+vector<Town> read_towns(int quantity) {
+    vector<Town> towns;
 
-int main(int argc, char** argv) {
-    int n; cin >> n;
-    vector <int> path;
-    
-    for (int i = 1; i <= n; i++) {
+    for (int i = 1; i <= quantity; i++) {
         int id, x, y;
         cin >> id >> x >> y;
         towns.push_back(Town(id, x, y));
     }
+
+    return towns;
+}
+
+int main(int argc, char** argv) {
+    int n; cin >> n;
+    vector <Town> towns = read_towns(n);
+    vector <int> hamilton;
     
-    Town cur = towns[0];
-    path.push_back(cur.id);
-    towns.erase(remove(towns.begin(), towns.end(), cur), towns.end());
+    Town current = towns[0];
+    hamilton.push_back(current.id);
+    towns.erase(remove(towns.begin(), towns.end(), current), towns.end());
     
     while (!towns.empty()) {
-        Town closest;
-        int min_dst = INF;
+        Town closest = towns[0];
+        int closest_dst = MAX_INT; // = infinity
 
         for (Town t: towns) {
-            int dst = cur.dst_sq(t);
-            if (dst < min_dst) {
+            int dst = current.dst_sq(t);
+            if (dst < closest_dst) {
                 closest = t;
-                min_dst = dst;
+                closest_dst = dst;
             }
         }
 
-        path.push_back(closest.id);
+        hamilton.push_back(closest.id);
         towns.erase(remove(towns.begin(), towns.end(), closest), towns.end());
-        cur = closest;
+        current = closest;
     }
 
-    for (int p: path) {
+    for (int p: hamilton) {
         cout << p << " ";
     } cout << endl;
     
