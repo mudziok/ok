@@ -9,7 +9,7 @@ class Town {
     public:
     int id, x, y;
 
-    Town(int _id, int _x, int _y) : id(_id), x(_x), y(_y) {}
+    Town(int id, int x, int y) : id(id), x(x), y(y) {}
 
     int dst_sq(Town t) {
         int dx = x - t.x;
