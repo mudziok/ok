@@ -5,11 +5,11 @@ type Point = (Int, Int, Int)
 
 readLine :: String -> Point
 readLine s = 
-    let (a:b:c:_) = map read (words s)
+    let (a:b:c:_) = map read $ words s
     in (a,b,c)
 
 parse :: String -> [Point]
-parse xs = map readLine (lines xs)
+parse xs = map readLine $ lines xs
 
 showLine :: Point -> String
 showLine (a,b,c) = unwords $ map show [a,b,c]
@@ -32,4 +32,4 @@ solve (x:xs) =
 main = do
     n <- getLine
     testcase <- getContents  
-    putStr $ unlines (map (\(id,_,_) -> (show id) ++ " ") (solve (parse testcase)))
+    putStr $ unwords (map (\(id,_,_) -> (show id)) (solve . parse $ testcase ))
