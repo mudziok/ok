@@ -6,9 +6,12 @@
 #include "Gene.h"
 
 using namespace std;
-int MAX_INT = 2147483647;
 
 vector <Town> towns;
+
+pair<double, Gene> bestGene(vector <pair<double, Gene>> lengths) {
+    return *min_element(lengths.begin(), lengths.end(), [](const auto& a, const auto& b) { return a.first < b.first; });
+}
 
 vector <pair<double, Gene>> evaluate(vector<Gene> genes) {
     vector <pair<double, Gene>> evaluated;
@@ -18,25 +21,35 @@ vector <pair<double, Gene>> evaluate(vector<Gene> genes) {
     return evaluated;
 }
 
-vector <pair<double, Gene>> fitnesses(vector <pair<double, Gene>> genes, double best_length) {
+// rates solutions from 1 to 0 in a ?logarythmic? fashion
+vector <pair<double, Gene>> calcFitness(vector <pair<double, Gene>> genes, double best_length) {
     for (auto &g: genes) {
         g.first = pow(best_length / g.first, 5.0);
     }
     return genes;
 }
 
-Gene randomGene(vector <pair<double, Gene>> genes) {
+Gene randomGene(vector <pair<double, Gene>> odds) {
     double x = rand() / (RAND_MAX + 1.0);
     double sum = 0.0;
-    for (auto p: genes) {
+    for (auto p: odds) {
         Gene g = p.second;
         sum += p.first;
         if (sum > x) { return g; }
     }
 
-    return genes[genes.size() - 1].second;
+    return odds[odds.size() - 1].second;
 }
 
+vector <pair<double, Gene>> normalize(vector <pair<double, Gene>> fitnesses) {
+    double sum = accumulate(fitnesses.begin(), fitnesses.end(), 0.0, [](double acc, auto p) { return acc + p.first; });
+    
+    for (auto &g: fitnesses) {
+        g.first = g.first / sum;
+    }
+
+    return fitnesses;
+}
 
 int main(int argc, char** argv) {
     srand(time(NULL));
@@ -51,39 +64,22 @@ int main(int argc, char** argv) {
     }
 
     for (int i = 0; i < 10000; i++) {
-        vector <pair<double, Gene>> ev = evaluate(genes);
+        vector <pair<double, Gene>> lengths = evaluate(genes);
 
-        best = {1000000.0, Gene(towns)};
-        for (auto p: ev) {
-            if (p.first < best.first) {
-                best = p;
-            }
-        }
+        best = bestGene(lengths);
 
-        vector <pair<double, Gene>> fit = fitnesses(ev, best.first);
+        vector <pair<double, Gene>> fitnesses = calcFitness(lengths, best.first);
 
-
-        double sum = 0.0;
-        for (auto p: fit) {
-            sum += p.first;
-        }
-
-        for (auto &g: fit) {
-            g.first = g.first / sum;
-        }
-
-        //cout << best.first << endl;
-        // for (auto g: ev) {
-        //      cout << g.first << " - " << g.second << endl;
-        // }
+        vector <pair<double, Gene>> odds = normalize(fitnesses);
 
         vector <Gene> new_genes;
         for (Gene g: genes) {
-            new_genes.push_back(Gene(randomGene(fit), randomGene(fit)));
+            new_genes.push_back(Gene(randomGene(odds), randomGene(odds)));
         }
         genes = new_genes;
     }
-    //cout << best.first << endl;
+    
+    best = bestGene(evaluate(genes));
     cout << best.second << endl;
 
     return 0;

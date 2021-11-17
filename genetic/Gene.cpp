@@ -27,7 +27,6 @@ Gene::Gene(vector<Town> towns) {
     genome = scramble(genome);
 }
 
-
 Gene::Gene(Gene x, Gene y) {
     int l = x.genome.size();
     std::vector<int> new_genome(l, 0);
@@ -57,7 +56,6 @@ Gene::Gene(Gene x, Gene y) {
 double Gene::length(vector<Town> towns) {
     double length = 0.0;
     int last = genome[genome.size() - 1];
-    //cout << "last " << last << endl;
     for (int t: genome) {
         length += towns[last - 1].dst(towns[t - 1]);
         last = t;
