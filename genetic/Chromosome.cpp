@@ -1,16 +1,16 @@
-#include "Gene.h"
+#include "Chromosome.h"
 
 #include <algorithm>
 #include <random>
 
 using namespace std;
 
-vector <int> Gene::scramble(vector <int> original) {
+vector <int> Chromosome::scramble(vector <int> original) {
     random_shuffle(original.begin(), original.end());
     return original;
 }
 
-vector <int> Gene::mutate(vector <int> original) {
+vector <int> Chromosome::mutate(vector <int> original) {
     int z = max(0, (rand() % 4) - 2);
     for (int i = 0; i < z; i++) {
         int x = rand() % original.size();
@@ -20,14 +20,14 @@ vector <int> Gene::mutate(vector <int> original) {
     return original;
 }
 
-Gene::Gene(vector<Town> towns) {
+Chromosome::Chromosome(vector<Town> towns) {
     for (Town t: towns) {
         genome.push_back(t.id);
     }
     genome = scramble(genome);
 }
 
-Gene::Gene(Gene x, Gene y) {
+Chromosome::Chromosome(Chromosome x, Chromosome y) {
     int l = x.genome.size();
     std::vector<int> new_genome(l, 0);
 
@@ -53,7 +53,7 @@ Gene::Gene(Gene x, Gene y) {
     genome = new_genome;
 }
 
-double Gene::length(vector<Town> towns) {
+double Chromosome::length(vector<Town> towns) {
     double length = 0.0;
     int last = genome[genome.size() - 1];
     for (int t: genome) {
@@ -63,7 +63,7 @@ double Gene::length(vector<Town> towns) {
     return length;
 }
 
-ostream &operator<<(ostream& os, const Gene& gene) {
+ostream &operator<<(ostream& os, const Chromosome& gene) {
     for (int g: gene.genome) {
         os << g << " ";
     }

@@ -3,49 +3,49 @@
 #include <bits/stdc++.h>
 #include "../utility/Town.h"
 #include "../utility/utility.h"
-#include "Gene.h"
+#include "Chromosome.h"
 
 using namespace std;
 
 vector <Town> towns;
 
-pair<double, Gene> bestGene(vector <pair<double, Gene>> lengths) {
+pair<double, Chromosome> bestChromosome(vector <pair<double, Chromosome>> lengths) {
     return *min_element(lengths.begin(), lengths.end(), [](const auto& a, const auto& b) { return a.first < b.first; });
 }
 
-vector <pair<double, Gene>> evaluate(vector<Gene> genes) {
-    vector <pair<double, Gene>> evaluated;
-    for (Gene g: genes) {
-        evaluated.push_back({g.length(towns), g});
+vector <pair<double, Chromosome>> evaluate(vector<Chromosome> chromosomes) {
+    vector <pair<double, Chromosome>> evaluated;
+    for (Chromosome c: chromosomes) {
+        evaluated.push_back({c.length(towns), c});
     }
     return evaluated;
 }
 
 // rates solutions from 1 to 0 in a ?logarythmic? fashion
-vector <pair<double, Gene>> calcFitness(vector <pair<double, Gene>> genes, double best_length) {
-    for (auto &g: genes) {
-        g.first = pow(best_length / g.first, 6.0);
+vector <pair<double, Chromosome>> calcFitness(vector <pair<double, Chromosome>> chromosomes, double best_length) {
+    for (auto &c: chromosomes) {
+        c.first = pow(best_length / c.first, 6.0);
     }
-    return genes;
+    return chromosomes;
 }
 
-Gene randomGene(vector <pair<double, Gene>> odds) {
+Chromosome randomGene(vector <pair<double, Chromosome>> odds) {
     double x = rand() / (RAND_MAX + 1.0);
     double sum = 0.0;
     for (auto p: odds) {
-        Gene g = p.second;
+        Chromosome c = p.second;
         sum += p.first;
-        if (sum > x) { return g; }
+        if (sum > x) { return c; }
     }
 
     return odds[odds.size() - 1].second;
 }
 
-vector <pair<double, Gene>> normalize(vector <pair<double, Gene>> fitnesses) {
+vector <pair<double, Chromosome>> normalize(vector <pair<double, Chromosome>> fitnesses) {
     double sum = accumulate(fitnesses.begin(), fitnesses.end(), 0.0, [](double acc, auto p) { return acc + p.first; });
     
-    for (auto &g: fitnesses) {
-        g.first = g.first / sum;
+    for (auto &c: fitnesses) {
+        c.first = c.first / sum;
     }
 
     return fitnesses;
@@ -56,29 +56,29 @@ int main(int argc, char** argv) {
 
     int n; cin >> n;
     towns = read_towns(n);
-    vector <Gene> genes;
+    vector <Chromosome> chromosomes;
 
     for (int i = 0; i < 40; i++) {
-        genes.push_back(Gene(towns));
+        chromosomes.push_back(Chromosome(towns));
     }
 
-    for (int i = 0; i < 50000; i++) {
-        vector <pair<double, Gene>> lengths = evaluate(genes);
+    for (int i = 0; i < 5000; i++) {
+        vector <pair<double, Chromosome>> lengths = evaluate(chromosomes);
 
-        pair<double, Gene> best = bestGene(lengths);
+        pair<double, Chromosome> best = bestChromosome(lengths);
 
-        vector <pair<double, Gene>> fitnesses = calcFitness(lengths, best.first);
+        vector <pair<double, Chromosome>> fitnesses = calcFitness(lengths, best.first);
 
-        vector <pair<double, Gene>> odds = normalize(fitnesses);
+        vector <pair<double, Chromosome>> odds = normalize(fitnesses);
 
-        vector <Gene> new_genes;
-        for (Gene g: genes) {
-            new_genes.push_back(Gene(randomGene(odds), randomGene(odds)));
+        vector <Chromosome> new_chromosomes;
+        for (Chromosome c: chromosomes) {
+            new_chromosomes.push_back(Chromosome(randomGene(odds), randomGene(odds)));
         }
-        genes = new_genes;
+        chromosomes = new_chromosomes;
     }
     
-    pair<double, Gene> best = bestGene(evaluate(genes));
+    pair<double, Chromosome> best = bestChromosome(evaluate(chromosomes));
     cout << best.second << endl;
 
     return 0;
