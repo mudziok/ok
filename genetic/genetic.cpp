@@ -24,7 +24,7 @@ vector <pair<double, Gene>> evaluate(vector<Gene> genes) {
 // rates solutions from 1 to 0 in a ?logarythmic? fashion
 vector <pair<double, Gene>> calcFitness(vector <pair<double, Gene>> genes, double best_length) {
     for (auto &g: genes) {
-        g.first = pow(best_length / g.first, 5.0);
+        g.first = pow(best_length / g.first, 6.0);
     }
     return genes;
 }
@@ -57,16 +57,15 @@ int main(int argc, char** argv) {
     int n; cin >> n;
     towns = read_towns(n);
     vector <Gene> genes;
-    pair<double, Gene> best {1000000.0, Gene(towns)};
 
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 40; i++) {
         genes.push_back(Gene(towns));
     }
 
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 50000; i++) {
         vector <pair<double, Gene>> lengths = evaluate(genes);
 
-        best = bestGene(lengths);
+        pair<double, Gene> best = bestGene(lengths);
 
         vector <pair<double, Gene>> fitnesses = calcFitness(lengths, best.first);
 
@@ -79,7 +78,7 @@ int main(int argc, char** argv) {
         genes = new_genes;
     }
     
-    best = bestGene(evaluate(genes));
+    pair<double, Gene> best = bestGene(evaluate(genes));
     cout << best.second << endl;
 
     return 0;
