@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <random>
+#include "recombinators/CX.h"
+#include "recombinators/PMX.h"
 
 using namespace std;
 
@@ -11,7 +13,8 @@ vector <int> Chromosome::scramble(vector <int> original) {
 }
 
 vector <int> Chromosome::mutate(vector <int> original) {
-    int z = max(0, (rand() % 4) - 2);
+    int l = original.size() /2;
+    int z = max(0, (rand() % l) - (l / 2));
     for (int i = 0; i < z; i++) {
         int x = rand() % original.size();
         int y = rand() % original.size();
@@ -28,29 +31,10 @@ Chromosome::Chromosome(vector<Town> towns) {
 }
 
 Chromosome::Chromosome(Chromosome x, Chromosome y) {
-    int l = x.genome.size();
-    std::vector<int> new_genome(l, 0);
+    Recombinator* r = new CX();
+    std::vector<int> new_genome = r->crossover(x.genome, y.genome);
 
-    int start = x.genome[0];
-    int last = x.genome[0];
-    for (int i = 0; i < l; i++) {
-        int index = find(x.genome.begin(), x.genome.end(), last) - x.genome.begin();
-        new_genome[index] = last;
-        last = y.genome[index];
-        if (last == start) {
-            break;
-        }
-    }
-
-    for (int i = 0; i < l; i++) {
-        if (new_genome[i] == 0) {
-            new_genome[i] = y.genome[i];
-        }
-    }
-
-    new_genome = mutate(new_genome);
-
-    genome = new_genome;
+    genome = mutate(new_genome);
 }
 
 double Chromosome::length(vector<Town> towns) {
