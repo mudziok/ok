@@ -35,13 +35,18 @@ def trace(instance, hamilton):
         lines = np.concatenate((lines, np.array([[x, y]])))
     plt.plot(*lines.T, color = 'tab:blue')
 
+def distance(x, y):
+    return np.sqrt(np.sum((x - y)**2))
+
 def process_instance(filepath):
     instance, txt = load_instance_file(filepath)
 
-    stdout = run_exe('greedy.exe', txt)
+    stdout = run_exe('genetic.exe', txt)
     hamilton = [int(x) for x in stdout.split()]
 
-    plt.title(filepath)
+    score = np.sum([distance(instance[x - 1], instance[y - 1]) for x, y in zip(hamilton, hamilton[1:] + hamilton[:1])])
+
+    plt.title(filepath + f' ({score})')
     plt.scatter(*instance.T, color = 'tab:blue')
     trace(instance, hamilton)
 
