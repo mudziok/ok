@@ -52,23 +52,20 @@ int main(int argc, char** argv) {
     srand(time(NULL));
 
     int n; cin >> n;
-    int population = 10;
+    int population = 60;
     towns = read_towns(n);
     vector <Chromosome> chromosomes;
 
     for (int i = 0; i < population * 2; i++) {
-        chromosomes.push_back(Chromosome(towns));
+        int start = int(double(i)/(population * 2) * double(towns.size()));
+        chromosomes.push_back(Chromosome(towns, start));
     }
 
-    for (int i = 0; i < 50000; i++) {
+    for (int i = 0; i < 5000; i++) {
         vector <pair<double, Chromosome>> lengths = evaluate(chromosomes);
 
         pair<double, Chromosome> best = lengths[0];
-        // for (auto p: lengths) {
-        //     cout << p.first << " " << p.second << endl;
-        // }
         for (int i = 0; i < population; i++) { lengths.pop_back(); }
-        //cout << best.first << endl;
 
         vector <pair<double, Chromosome>> fitnesses = calcFitness(lengths, best.first);
         vector <pair<double, Chromosome>> odds = normalize(fitnesses);
@@ -76,7 +73,7 @@ int main(int argc, char** argv) {
         vector <Chromosome> new_chromosomes;
         for (pair<double, Chromosome> p: odds) {
             new_chromosomes.push_back(p.second);
-            new_chromosomes.push_back(Chromosome(randomGene(odds), randomGene(odds)));
+            new_chromosomes.push_back(Chromosome(randomGene(odds), randomGene(odds), towns));
         }
         chromosomes = new_chromosomes;
     }

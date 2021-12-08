@@ -1,5 +1,6 @@
 import Data.List
 import Data.Function
+import System.Environment
 
 type Point = (Int, Int, Int)
 
@@ -29,7 +30,13 @@ solve (x:xs) =
     let sorted = sortBy (compare `on` (distance x)) xs
     in [x] ++ solve sorted
 
+cycle' :: Int -> [Point] -> [Point]
+cycle' 0 xs = xs
+cycle' i (x:xs) = cycle' (i - 1) xs ++ [x]
+
 main = do
+    args <- getArgs  
+    let i = read . head $ args 
     n <- getLine
-    testcase <- getContents  
-    putStr $ unwords (map (\(id,_,_) -> (show id)) (solve . parse $ testcase ))
+    testcase <- getContents
+    putStr $ unwords (map (\(id,_,_) -> (show id)) (solve . (cycle' i) . parse $ testcase ))

@@ -5,6 +5,8 @@ from subprocess import PIPE, Popen
 import numpy as np
 from matplotlib import pyplot as plt
 
+fig, ax = plt.subplots()
+
 INSTANCE_DIR = "instances"
 
 def run_exe(filepath, stdin):
@@ -46,11 +48,12 @@ def process_instance(filepath):
 
     score = np.sum([distance(instance[x - 1], instance[y - 1]) for x, y in zip(hamilton, hamilton[1:] + hamilton[:1])])
 
-    plt.title(filepath + f' ({score})')
+    plt.title(f'{filepath} ({score})')
     plt.scatter(*instance.T, color = 'tab:blue')
     trace(instance, hamilton)
 
-    plt.show()
+    ax.set_aspect('equal')
+    plt.show(block=True)
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
